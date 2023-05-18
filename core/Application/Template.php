@@ -13,7 +13,6 @@ class Template
 {
     private $template_dir;
     private $layout_dir;
-    private $cache_duration;
 
     /**
      * Template constructor.
@@ -22,7 +21,6 @@ class Template
     {
         $this->template_dir = $_ENV['VIEW_PATH'];
         $this->layout_dir = $_ENV['LAYOUT_PATH'];
-        $this->cache_duration = $_ENV['TEMPLATE_CACHE_DURATION'];
     }
 
     /**
@@ -39,7 +37,7 @@ class Template
         $this->clear_expired_cache();
         // Check if the cached file is still valid
         $cache_path = $this->locate_cache($template_name);
-        if (!$this->is_cache_valid($cache_path)) {
+        if (!file_exists($cache_path)) {
             // Cache has expired or doesn't exist, recompile the template
             if ($layout_name == null) {
                 $compiled_template = $this->compile_template($template_name);
@@ -236,27 +234,6 @@ class Template
                 unlink($file);
             }
         }
-    }
-
-    /**
-     * Determines if the cache file is still valid based on its creation timestamp and cache duration.
-     *
-     * @param string $path The path of the cache file.
-     *
-     * @return bool True if the cache is valid, false otherwise.
-     */
-    private function is_cache_valid($path)
-    {
-        //This method prevents frequent recompilation.
-        if (!file_exists($path)) {
-            return false;
-        }
-
-        $cache_time = filemtime($path);
-        $expiration_time = $cache_time + $this->cache_duration;
-        $current_time = time();
-
-        return $current_time < $expiration_time;
     }
 
     /**
