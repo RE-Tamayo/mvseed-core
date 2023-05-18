@@ -3,6 +3,7 @@
     "description": "A modular an extensible micro framework for php.",
     "type": "library",
     "require": {
+        "php": ">=7.4",
         "vlucas/phpdotenv": "^5.5"
     },
     "license": "MIT",
