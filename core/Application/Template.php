@@ -13,6 +13,7 @@ class Template
 {
     private $template_dir;
     private $layout_dir;
+    private $cache_duration;
 
     /**
      * Template constructor.
@@ -21,6 +22,7 @@ class Template
     {
         $this->template_dir = $_ENV['VIEW_PATH'];
         $this->layout_dir = $_ENV['LAYOUT_PATH'];
+        $this->cache_duration = $_ENV['TEMPLATE_CACHE_DURATION'];
     }
 
     /**
@@ -35,17 +37,21 @@ class Template
     public function render($template_name, $vars = [], $layout_name = null)
     {
         // $this->clear_template_cache();
-        if ($layout_name == null) {
-            $this->compile_template($template_name);
-            extract($vars);
-            require $this->locate_cache($template_name);
-        } else {
-            $compiled_template = $this->compile_template($template_name);
-            $this->compile_layout($layout_name, $template_name, $compiled_template);
-            extract($vars);
-            require $this->locate_cache($template_name);
-        }
+        // Check if the cached file is still valid
+        $cache_path = $this->locate_cache($template_name);
+        if (!$this->is_cache_valid($cache_path)) {
+            // Cache has expired or doesn't exist, recompile the template
+            if ($layout_name == null) {
+                $compiled_template = $this->compile_template($template_name);
+            } else {
+                $compiled_template = $this->compile_template($template_name);
+                $this->compile_layout($layout_name, $template_name, $compiled_template);
+            }
+        }       
+        extract($vars);
+        require $cache_path;
     }
+    
 
     /**
      * Compiles the layout file.
@@ -230,5 +236,25 @@ class Template
                 unlink($file);
             }
         }
+    }
+
+    /**
+     * Determines if the cache file is still valid based on its creation timestamp and cache duration.
+     *
+     * @param string $path The path of the cache file.
+     *
+     * @return bool True if the cache is valid, false otherwise.
+     */
+    private function is_cache_valid($path)
+    {
+        if (!file_exists($path)) {
+            return false;
+        }
+
+        $cache_time = filemtime($path);
+        $expiration_time = $cache_time + $this->cache_duration;
+        $current_time = time();
+
+        return $current_time < $expiration_time;
     }
 }
