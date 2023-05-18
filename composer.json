@@ -1,0 +1,24 @@
+{
+    "name": "retamayo/mvseed",
+    "description": "A modular an extensible micro framework for php.",
+    "type": "library",
+    "require": {
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "license": "MIT",
+    "autoload": {
+        "files": [
+            "core/Utility/functions.php"
+        ],
+        "psr-4": {
+            "Mvseed\\": "core/"
+        }
+    },
+    "authors": [
+        {
+            "name": "RE-Tamayo",
+            "email": "rosas.emerjoe.tamayo@gmail.com"
+        }
+    ],
+    "minimum-stability": "alpha"
+}
