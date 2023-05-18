@@ -36,7 +36,7 @@ class Template
      */
     public function render($template_name, $vars = [], $layout_name = null)
     {
-        // $this->clear_template_cache();
+        $this->clear_expired_cache();
         // Check if the cached file is still valid
         $cache_path = $this->locate_cache($template_name);
         if (!$this->is_cache_valid($cache_path)) {
@@ -47,11 +47,11 @@ class Template
                 $compiled_template = $this->compile_template($template_name);
                 $this->compile_layout($layout_name, $template_name, $compiled_template);
             }
-        }       
+        }
         extract($vars);
         require $cache_path;
     }
-    
+
 
     /**
      * Compiles the layout file.
@@ -247,6 +247,7 @@ class Template
      */
     private function is_cache_valid($path)
     {
+        //This method prevents frequent recompilation.
         if (!file_exists($path)) {
             return false;
         }
@@ -256,5 +257,23 @@ class Template
         $current_time = time();
 
         return $current_time < $expiration_time;
+    }
+
+    /**
+     * Clears the expired cache files based on the maximum age.
+     */
+    private function clear_expired_cache()
+    {
+        //This method prevents cache file build up.
+        $cachePath = $_ENV['CACHE_PATH'] . 'template_cache/';
+        $maxAge = 3600; // Maximum age in seconds (e.g., 1 hour)
+
+        $files = glob($cachePath . '*.php');
+
+        foreach ($files as $file) {
+            if (is_file($file) && (time() - filemtime($file)) > $maxAge) {
+                unlink($file);
+            }
+        }
     }
 }
