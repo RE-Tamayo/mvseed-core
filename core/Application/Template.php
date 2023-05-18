@@ -34,7 +34,7 @@ class Template
      */
     public function render($template_name, $vars = [], $layout_name = null)
     {
-        $this->clear_template_cache();
+        // $this->clear_template_cache();
         if ($layout_name == null) {
             $this->compile_template($template_name);
             extract($vars);
