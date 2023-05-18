@@ -1,6 +1,6 @@
 {
-    "name": "retamayo/mvseed",
-    "description": "A modular an extensible micro framework for php.",
+    "name": "retamayo/mvseed-core",
+    "description": "A modular an extensible core for the mvseed framework.",
     "type": "library",
     "require": {
         "php": ">=7.4",
